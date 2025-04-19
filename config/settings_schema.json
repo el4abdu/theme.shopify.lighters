@@ -148,6 +148,12 @@
         "id": "social_twitter",
         "label": "Twitter",
         "info": "https://twitter.com/yourusername"
+      },
+      {
+        "type": "text",
+        "id": "social_pinterest",
+        "label": "Pinterest",
+        "info": "https://pinterest.com/yourusername"
       }
     ]
   }
