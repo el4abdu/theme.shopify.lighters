@@ -1,0 +1,44 @@
+{
+  "general": {
+    "404": {
+      "title": "Page not found",
+      "subtext": "The page you were looking for does not exist.",
+      "search_prompt": "Try searching for what you're looking for:",
+      "back_to_home": "Back to home page",
+      "view_products": "View all products"
+    },
+    "search": {
+      "placeholder": "Search our store",
+      "submit": "Search"
+    },
+    "navigation": {
+      "menu": "Menu",
+      "account": "Account",
+      "cart": "Cart"
+    }
+  },
+  "products": {
+    "product": {
+      "add_to_cart": "Add to cart",
+      "sold_out": "Sold out",
+      "unavailable": "Unavailable"
+    }
+  },
+  "customer": {
+    "account": {
+      "title": "My Account",
+      "details": "Account Details",
+      "view_addresses": "View Addresses",
+      "return": "Return to Account Details"
+    }
+  },
+  "cart": {
+    "general": {
+      "title": "Shopping Cart",
+      "empty": "Your cart is currently empty.",
+      "continue_shopping": "Continue shopping",
+      "checkout": "Checkout",
+      "update": "Update Cart"
+    }
+  }
+} 
