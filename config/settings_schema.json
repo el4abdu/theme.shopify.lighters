@@ -1,66 +1,154 @@
-{
-  "name": "Global Testimonials",
-  "settings": [
-    {
-      "type": "header",
-      "content": "Testimonials Display"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_global_testimonials",
-      "label": "Show global testimonials",
-      "default": true
-    },
-    {
-      "type": "text",
-      "id": "testimonials_title",
-      "label": "Testimonials title",
-      "default": "What Our Customers Say"
-    },
-    {
-      "type": "text",
-      "id": "testimonials_subtitle",
-      "label": "Testimonials subtitle",
-      "default": "Read what customers are saying about our products"
-    },
-    {
-      "type": "color",
-      "id": "testimonials_bg_color",
-      "label": "Background color",
-      "default": "#f8f8f8"
-    },
-    {
-      "type": "color",
-      "id": "testimonials_text_color",
-      "label": "Text color",
-      "default": "#333333"
-    },
-    {
-      "type": "color",
-      "id": "testimonial_card_bg",
-      "label": "Testimonial card background",
-      "default": "#ffffff"
-    },
-    {
-      "type": "color",
-      "id": "testimonial_accent_color",
-      "label": "Accent color (stars, quotes)",
-      "default": "#f2994a"
-    },
-    {
-      "type": "header",
-      "content": "Call to Action"
-    },
-    {
-      "type": "text",
-      "id": "testimonials_cta_text",
-      "label": "CTA button text",
-      "default": "Write a Review"
-    },
-    {
-      "type": "url",
-      "id": "testimonials_cta_url",
-      "label": "CTA button link"
-    }
-  ]
-} 
+[
+  {
+    "name": "Theme Information",
+    "settings": [
+      {
+        "type": "paragraph",
+        "content": "Lighter Store Theme 1.0.0"
+      }
+    ]
+  },
+  {
+    "name": "Global Testimonials",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Testimonials Display"
+      },
+      {
+        "type": "checkbox",
+        "id": "show_global_testimonials",
+        "label": "Show global testimonials",
+        "default": true
+      },
+      {
+        "type": "text",
+        "id": "testimonials_title",
+        "label": "Testimonials title",
+        "default": "What Our Customers Say"
+      },
+      {
+        "type": "text",
+        "id": "testimonials_subtitle",
+        "label": "Testimonials subtitle",
+        "default": "Read what customers are saying about our products"
+      },
+      {
+        "type": "color",
+        "id": "testimonials_bg_color",
+        "label": "Background color",
+        "default": "#f8f8f8"
+      },
+      {
+        "type": "color",
+        "id": "testimonials_text_color",
+        "label": "Text color",
+        "default": "#333333"
+      },
+      {
+        "type": "color",
+        "id": "testimonial_card_bg",
+        "label": "Testimonial card background",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "testimonial_accent_color",
+        "label": "Accent color (stars, quotes)",
+        "default": "#f2994a"
+      },
+      {
+        "type": "header",
+        "content": "Call to Action"
+      },
+      {
+        "type": "text",
+        "id": "testimonials_cta_text",
+        "label": "CTA button text",
+        "default": "Write a Review"
+      },
+      {
+        "type": "url",
+        "id": "testimonials_cta_url",
+        "label": "CTA button link"
+      }
+    ]
+  },
+  {
+    "name": "Colors",
+    "settings": [
+      {
+        "type": "header",
+        "content": "General Colors"
+      },
+      {
+        "type": "color",
+        "id": "primary_color",
+        "label": "Primary color",
+        "default": "#4a90e2"
+      },
+      {
+        "type": "color",
+        "id": "secondary_color",
+        "label": "Secondary color",
+        "default": "#f2994a"
+      },
+      {
+        "type": "color",
+        "id": "background_color",
+        "label": "Background color",
+        "default": "#ffffff"
+      },
+      {
+        "type": "color",
+        "id": "text_color",
+        "label": "Text color",
+        "default": "#333333"
+      }
+    ]
+  },
+  {
+    "name": "Typography",
+    "settings": [
+      {
+        "type": "font_picker",
+        "id": "heading_font",
+        "label": "Heading font",
+        "default": "helvetica_n4"
+      },
+      {
+        "type": "font_picker",
+        "id": "body_font",
+        "label": "Body font",
+        "default": "helvetica_n4"
+      }
+    ]
+  },
+  {
+    "name": "Social Media",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Social Accounts"
+      },
+      {
+        "type": "text",
+        "id": "social_facebook",
+        "label": "Facebook",
+        "info": "https://facebook.com/yourusername"
+      },
+      {
+        "type": "text",
+        "id": "social_instagram",
+        "label": "Instagram",
+        "info": "https://instagram.com/yourusername"
+      },
+      {
+        "type": "text",
+        "id": "social_twitter",
+        "label": "Twitter",
+        "info": "https://twitter.com/yourusername"
+      }
+    ]
+  }
+] 
