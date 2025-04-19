@@ -1,0 +1,311 @@
+{% comment %}
+  The search results template
+{% endcomment %}
+
+<div class="page-width">
+  <div class="search-container">
+    <div class="search-header">
+      <h1>{{ 'general.search.results_title' | t }}</h1>
+      
+      <form action="/search" method="get" class="search-form" role="search">
+        <div class="search-input-group">
+          <input type="search" 
+                 name="q" 
+                 value="{{ search.terms | escape }}"
+                 placeholder="{{ 'general.search.placeholder' | t }}"
+                 class="search-input"
+                 aria-label="{{ 'general.search.placeholder' | t }}">
+          <button type="submit" class="search-button">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <span class="visually-hidden">{{ 'general.search.submit' | t }}</span>
+          </button>
+        </div>
+      </form>
+    </div>
+    
+    {% if search.performed %}
+      {% if search.results_count > 0 %}
+        <div class="search-results-count">
+          {% if search.results_count == 1 %}
+            {{ 'general.search.results_with_count.one' | t: count: search.results_count, terms: search.terms }}
+          {% else %}
+            {{ 'general.search.results_with_count.other' | t: count: search.results_count, terms: search.terms }}
+          {% endif %}
+        </div>
+        
+        <div class="search-results">
+          {% for item in search.results %}
+            {% if item.object_type == 'product' %}
+              <div class="search-product">
+                <a href="{{ item.url }}" class="search-product-link">
+                  <div class="search-product-image">
+                    {% if item.image %}
+                      <img src="{{ item.image | img_url: '300x300', crop: 'center' }}" 
+                           alt="{{ item.title | escape }}" 
+                           loading="lazy"
+                           width="300" 
+                           height="300">
+                    {% else %}
+                      <div class="search-product-image-placeholder">
+                        <i class="fa-solid fa-image"></i>
+                      </div>
+                    {% endif %}
+                  </div>
+                  
+                  <div class="search-product-details">
+                    <h2 class="search-product-title">{{ item.title }}</h2>
+                    <div class="search-product-price">{{ item.price | money }}</div>
+                    {% if item.available %}
+                      <span class="search-product-availability in-stock">{{ 'products.product.available' | t }}</span>
+                    {% else %}
+                      <span class="search-product-availability out-of-stock">{{ 'products.product.sold_out' | t }}</span>
+                    {% endif %}
+                  </div>
+                </a>
+              </div>
+            {% else %}
+              <div class="search-item">
+                <h2 class="search-item-title">
+                  <a href="{{ item.url }}">{{ item.title }}</a>
+                </h2>
+                {% if item.object_type == 'page' %}
+                  <span class="search-item-type">{{ 'general.search.page' | t }}</span>
+                {% elsif item.object_type == 'article' %}
+                  <span class="search-item-type">{{ 'general.search.article' | t }}</span>
+                {% endif %}
+                <div class="search-item-content">
+                  {% if item.content contains search.terms %}
+                    {% assign excerpt_start = item.content | downcase | split: search.terms | first | size | minus: 40 %}
+                    {% assign excerpt_start = excerpt_start | at_least: 0 %}
+                    {{ item.content | slice: excerpt_start, 160 | strip_html | highlight: search.terms }}...
+                  {% else %}
+                    {{ item.content | strip_html | truncate: 160 }}
+                  {% endif %}
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+        
+        {% if paginate.pages > 1 %}
+          <div class="search-pagination">
+            {{ paginate | default_pagination }}
+          </div>
+        {% endif %}
+      {% else %}
+        <div class="search-no-results">
+          <p>{{ 'general.search.no_results' | t: terms: search.terms }}</p>
+          <h3>{{ 'general.search.suggestions' | t }}</h3>
+          <ul class="search-suggestions-list">
+            <li>{{ 'general.search.check_spelling' | t }}</li>
+            <li>{{ 'general.search.try_different_keywords' | t }}</li>
+            <li>{{ 'general.search.try_fewer_keywords' | t }}</li>
+          </ul>
+        </div>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .search-container {
+    padding: 60px 0;
+  }
+  
+  .search-header {
+    margin-bottom: 30px;
+  }
+  
+  .search-input-group {
+    display: flex;
+    max-width: 600px;
+    margin: 20px 0;
+  }
+  
+  .search-input {
+    flex: 1;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-right: none;
+    border-radius: 4px 0 0 4px;
+    font-size: 16px;
+  }
+  
+  .search-button {
+    background: {{ settings.primary_color }};
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 0 4px 4px 0;
+    cursor: pointer;
+  }
+  
+  .search-results-count {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #666;
+  }
+  
+  .search-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 30px;
+  }
+  
+  .search-product {
+    border: 1px solid #eee;
+    border-radius: 6px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  
+  .search-product:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .search-product-link {
+    display: block;
+    text-decoration: none;
+    color: {{ settings.text_color }};
+  }
+  
+  .search-product-image {
+    position: relative;
+    padding-top: 100%;
+    background: #f8f8f8;
+  }
+  
+  .search-product-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .search-product-image-placeholder {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ddd;
+    font-size: 50px;
+  }
+  
+  .search-product-details {
+    padding: 15px;
+  }
+  
+  .search-product-title {
+    font-size: 16px;
+    margin-bottom: 10px;
+    font-weight: 500;
+  }
+  
+  .search-product-price {
+    font-weight: 600;
+    color: {{ settings.primary_color }};
+    margin-bottom: 10px;
+  }
+  
+  .search-product-availability {
+    font-size: 14px;
+  }
+  
+  .in-stock {
+    color: green;
+  }
+  
+  .out-of-stock {
+    color: #e53e3e;
+  }
+  
+  .search-item {
+    grid-column: 1 / -1;
+    padding: 20px;
+    border: 1px solid #eee;
+    border-radius: 6px;
+  }
+  
+  .search-item-title {
+    font-size: 18px;
+    margin-bottom: 10px;
+  }
+  
+  .search-item-title a {
+    color: {{ settings.primary_color }};
+    text-decoration: none;
+  }
+  
+  .search-item-type {
+    display: inline-block;
+    padding: 3px 8px;
+    background: #f0f0f0;
+    border-radius: 4px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+  
+  .search-item-content {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  .search-pagination {
+    margin-top: 40px;
+    text-align: center;
+  }
+  
+  .search-no-results {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 0;
+  }
+  
+  .search-suggestions-list {
+    list-style-type: disc;
+    padding-left: 20px;
+    margin: 20px auto;
+    max-width: 500px;
+    text-align: left;
+  }
+  
+  .search-suggestions-list li {
+    margin-bottom: 10px;
+  }
+  
+  .visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+  }
+  
+  @media screen and (max-width: 990px) {
+    .search-results {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media screen and (max-width: 768px) {
+    .search-container {
+      padding: 40px 0;
+    }
+    
+    .search-results {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+</style> 

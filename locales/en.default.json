@@ -9,7 +9,19 @@
     },
     "search": {
       "placeholder": "Search our store",
-      "submit": "Search"
+      "submit": "Search",
+      "results_title": "Search results",
+      "no_results": "No results found for \"{{ terms }}\"",
+      "results_with_count": {
+        "one": "{{ count }} result for \"{{ terms }}\"",
+        "other": "{{ count }} results for \"{{ terms }}\""
+      },
+      "suggestions": "Suggestions",
+      "check_spelling": "Check the spelling of your search term",
+      "try_different_keywords": "Try using different keywords",
+      "try_fewer_keywords": "Try using fewer keywords",
+      "page": "Page",
+      "article": "Article"
     },
     "navigation": {
       "menu": "Menu",
@@ -21,7 +33,8 @@
     "product": {
       "add_to_cart": "Add to cart",
       "sold_out": "Sold out",
-      "unavailable": "Unavailable"
+      "unavailable": "Unavailable",
+      "available": "In stock"
     }
   },
   "customer": {
@@ -38,7 +51,18 @@
       "empty": "Your cart is currently empty.",
       "continue_shopping": "Continue shopping",
       "checkout": "Checkout",
-      "update": "Update Cart"
+      "update": "Update Cart",
+      "note": "Order special instructions",
+      "subtotal": "Subtotal",
+      "shipping_at_checkout": "Shipping and taxes calculated at checkout",
+      "savings": "Total Savings",
+      "remove": "Remove"
+    },
+    "labels": {
+      "product": "Product",
+      "price": "Price",
+      "quantity": "Quantity",
+      "total": "Total"
     }
   }
 } 
