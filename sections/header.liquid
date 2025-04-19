@@ -1,14 +1,24 @@
 <header class="site-header">
   <div class="header-wrapper page-width">
+    <div class="menu-toggle">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    
     <div class="header-logo">
       {% if section.settings.logo %}
-        <img src="{{ section.settings.logo | img_url: 'master' }}" alt="{{ shop.name }}">
+        <a href="/">
+          <img src="{{ section.settings.logo | img_url: 'master' }}" alt="{{ shop.name }}">
+        </a>
       {% else %}
-        <span class="h1">{{ shop.name }}</span>
+        <a href="/">
+          <span class="h1">{{ shop.name }}</span>
+        </a>
       {% endif %}
     </div>
     
-    <nav class="main-nav">
+    <nav class="main-nav desktop-only">
       {% for link in linklists.main-menu.links %}
         <a href="{{ link.url }}" class="nav-item">{{ link.title }}</a>
       {% endfor %}
@@ -21,6 +31,14 @@
         <span class="cart-count">{{ cart.item_count }}</span>
       </a>
     </div>
+  </div>
+  
+  <div class="mobile-nav">
+    <nav class="mobile-menu">
+      {% for link in linklists.main-menu.links %}
+        <a href="{{ link.url }}" class="mobile-nav-item">{{ link.title }}</a>
+      {% endfor %}
+    </nav>
   </div>
 </header>
 

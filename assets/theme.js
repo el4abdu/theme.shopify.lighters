@@ -16,6 +16,15 @@ document.addEventListener('DOMContentLoaded', function() {
   if (document.querySelector('.maintenance-related-products')) {
     initMaintenanceProducts();
   }
+  
+  // Fix for liquid errors in theme
+  fixMissingIcons();
+  
+  // Initialize any sliders
+  initSliders();
+  
+  // Mobile menu toggle
+  initMobileMenu();
 });
 
 // Theme initialization
@@ -624,4 +633,109 @@ function showCartNotification(message, isError = false) {
   setTimeout(() => {
     notification.classList.remove('visible');
   }, 3000);
+}
+
+// Function to handle missing icons gracefully
+function fixMissingIcons() {
+  // Check for any SVG errors and replace with fallback
+  document.querySelectorAll('.icon').forEach(function(icon) {
+    if (icon.innerHTML.trim() === '') {
+      // Create fallback icon
+      const iconName = Array.from(icon.classList)
+        .find(cls => cls.startsWith('icon-'))
+        ?.replace('icon-', '') || 'default';
+      
+      // Set a simple fallback for empty icons
+      if (iconName === 'cart') {
+        icon.innerHTML = '<svg viewBox="0 0 20 20"><path fill="currentColor" d="M18.936 5.14c-.154-.307-.459-.506-.808-.506h-12.735l-.304-1.011c-.151-.505-.616-.843-1.146-.843h-2.523c-.552 0-1 .447-1 1s.448 1 1 1h1.795l2.242 7.471c.151.505.616.843 1.146.843h8.37c.499 0 .944-.302 1.137-.765l2.898-6.675c.099-.229.117-.485.02-.725l-.092-.29zm-8.936 10.985c-1.104 0-2-.896-2-2s.896-2 2-2 2 .896 2 2-.896 2-2 2zm-6-2c0-1.104.896-2 2-2s2 .896 2 2-.896 2-2 2-2-.896-2-2z"></path></svg>';
+      } else if (iconName === 'search') {
+        icon.innerHTML = '<svg viewBox="0 0 20 20"><path fill="currentColor" d="M18.64 17.02l-5.31-5.31c.81-1.08 1.26-2.43 1.26-3.87 0-3.56-2.89-6.45-6.45-6.45S1.7 4.28 1.7 7.84s2.89 6.45 6.45 6.45c1.44 0 2.79-.45 3.87-1.26l5.31 5.31c.17.17.45.17.62 0l.69-.69c.17-.17.17-.45 0-.62zm-10.5-3.27c-3.25 0-5.9-2.65-5.9-5.9s2.65-5.9 5.9-5.9 5.9 2.65 5.9 5.9-2.65 5.9-5.9 5.9z"></path></svg>';
+      }
+    }
+  });
+}
+
+// Initialize sliders/carousels
+function initSliders() {
+  // Simple testimonials slider
+  const testimonialSliders = document.querySelectorAll('.testimonial-slider');
+  
+  testimonialSliders.forEach(slider => {
+    if (!slider) return;
+    
+    const slides = slider.querySelectorAll('.testimonial-item');
+    const totalSlides = slides.length;
+    if (totalSlides <= 1) return;
+    
+    let currentSlide = 0;
+    const nextBtn = slider.querySelector('.next-btn');
+    const prevBtn = slider.querySelector('.prev-btn');
+    
+    // Set initial state
+    updateSlides();
+    
+    // Next button click
+    if (nextBtn) {
+      nextBtn.addEventListener('click', function() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlides();
+      });
+    }
+    
+    // Previous button click
+    if (prevBtn) {
+      prevBtn.addEventListener('click', function() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        updateSlides();
+      });
+    }
+    
+    // Auto-rotate slides every 5 seconds
+    let autoSlide = setInterval(function() {
+      if (document.visibilityState === 'visible') {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlides();
+      }
+    }, 5000);
+    
+    // Pause on hover
+    slider.addEventListener('mouseenter', function() {
+      clearInterval(autoSlide);
+    });
+    
+    slider.addEventListener('mouseleave', function() {
+      autoSlide = setInterval(function() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        updateSlides();
+      }, 5000);
+    });
+    
+    // Update slide positions
+    function updateSlides() {
+      slides.forEach((slide, index) => {
+        slide.style.transform = `translateX(${(index - currentSlide) * 100}%)`;
+        slide.setAttribute('aria-hidden', index !== currentSlide);
+        
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+    }
+  });
+}
+
+// Mobile menu functionality
+function initMobileMenu() {
+  const menuToggle = document.querySelector('.menu-toggle');
+  const mobileNav = document.querySelector('.mobile-nav');
+  
+  if (!menuToggle || !mobileNav) return;
+  
+  menuToggle.addEventListener('click', function() {
+    menuToggle.classList.toggle('active');
+    mobileNav.classList.toggle('active');
+    document.body.classList.toggle('menu-open');
+  });
 } 
