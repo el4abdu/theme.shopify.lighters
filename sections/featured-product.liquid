@@ -1,0 +1,240 @@
+<div class="featured-product{% if section.settings.use_dark_theme %} dark-theme{% endif %}" id="featured-product-{{ section.id }}">
+  <div class="page-width">
+    <div class="section-header">
+      <h2>{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle %}
+        <p class="subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+    
+    {% assign product = all_products[section.settings.product] %}
+    
+    {% if product != empty %}
+      <div class="featured-product-container">
+        <div class="product-gallery">
+          <div class="product-main-image">
+            <img src="{{ product.featured_image | img_url: '600x' }}" 
+                alt="{{ product.featured_image.alt | escape }}">
+            
+            {% if section.settings.show_badge and product.compare_at_price > product.price %}
+              <span class="sale-badge">{{ section.settings.badge_text }}</span>
+            {% endif %}
+          </div>
+          
+          {% if section.settings.show_gallery and product.images.size > 1 %}
+            <div class="product-thumbnails">
+              {% for image in product.images limit: 4 %}
+                <div class="thumbnail{% if forloop.first %} active{% endif %}">
+                  <img src="{{ image | img_url: '100x' }}" alt="{{ image.alt | escape }}">
+                </div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+        
+        <div class="product-details">
+          <h3 class="product-title">
+            <a href="{{ product.url }}">{{ product.title }}</a>
+          </h3>
+          
+          <div class="product-price">
+            <span class="current-price">{{ product.price | money }}</span>
+            {% if product.compare_at_price > product.price %}
+              <span class="compare-price">{{ product.compare_at_price | money }}</span>
+              <span class="save-text">{{ section.settings.save_text }}</span>
+            {% endif %}
+          </div>
+          
+          {% if section.settings.show_rating %}
+            <div class="product-rating">
+              <div class="stars" data-rating="4.5">
+                {% for i in (1..5) %}
+                  <span class="star{% if i <= 4 %} filled{% endif %}{% if i == 5 %} half-filled{% endif %}">★</span>
+                {% endfor %}
+              </div>
+              <span class="rating-count">({{ section.settings.rating_count }})</span>
+            </div>
+          {% endif %}
+          
+          {% if section.settings.show_description %}
+            <div class="product-description">
+              {{ product.description | strip_html | truncatewords: section.settings.description_words }}
+            </div>
+          {% endif %}
+          
+          {% if section.settings.show_features %}
+            <ul class="product-features">
+              {% for block in section.blocks %}
+                {% if block.type == 'feature' %}
+                  <li {{ block.shopify_attributes }}>
+                    <span class="feature-icon">{{ block.settings.icon }}</span>
+                    {{ block.settings.text }}
+                  </li>
+                {% endif %}
+              {% endfor %}
+            </ul>
+          {% endif %}
+          
+          <form method="post" action="/cart/add" class="product-form">
+            <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+            <button type="submit" class="add-to-cart-btn"
+                  {% unless product.available %}disabled{% endunless %}
+                  style="background-color: {{ section.settings.button_color }}">
+              {% if product.available %}
+                {{ section.settings.button_text }}
+              {% else %}
+                {{ section.settings.sold_out_text }}
+              {% endif %}
+            </button>
+          </form>
+        </div>
+      </div>
+    {% else %}
+      <div class="placeholder">
+        <p>Select a product to feature</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured Product",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Featured Product"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Section Subtitle",
+      "default": "Our most popular lighter"
+    },
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Product"
+    },
+    {
+      "type": "checkbox",
+      "id": "use_dark_theme",
+      "label": "Use dark theme",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_badge",
+      "label": "Show sale badge",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "badge_text",
+      "label": "Sale badge text",
+      "default": "Sale"
+    },
+    {
+      "type": "text",
+      "id": "save_text",
+      "label": "Save text",
+      "default": "Save up to 30%"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_gallery",
+      "label": "Show image gallery",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_rating",
+      "label": "Show product rating",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "rating_count",
+      "label": "Rating count",
+      "default": "42 reviews"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show product description",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "description_words",
+      "min": 10,
+      "max": 50,
+      "step": 5,
+      "default": 20,
+      "label": "Description word count"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_features",
+      "label": "Show product features",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Add to cart button text",
+      "default": "Add to Cart"
+    },
+    {
+      "type": "text",
+      "id": "sold_out_text",
+      "label": "Sold out text",
+      "default": "Sold Out"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button color",
+      "default": "#ff4400"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Product Feature",
+      "settings": [
+        {
+          "type": "text",
+          "id": "icon",
+          "label": "Feature icon",
+          "default": "🔥"
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Feature text",
+          "default": "Premium refillable design"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Product",
+      "blocks": [
+        {
+          "type": "feature"
+        },
+        {
+          "type": "feature"
+        },
+        {
+          "type": "feature"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

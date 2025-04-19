@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="{{ request.locale.iso_code }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ page_title }}</title>
+  {{ content_for_header }}
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {{ 'theme.css' | asset_url | stylesheet_tag }}
+  
+  <!-- Image handling settings -->
+  <style>
+    /* Default placeholder styling */
+    .placeholder-image {
+      background-color: #f8f8f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 14px;
+    }
+    
+    /* Fade in images on load */
+    img.lazyload,
+    img.lazyloading {
+      opacity: 0;
+    }
+    
+    img.lazyloaded {
+      opacity: 1;
+      transition: opacity 0.3s;
+    }
+    
+    /* Global image optimization */
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+  </style>
+  
+  <!-- Placeholder image URLs - replace these with your actual images later -->
+  <script>
+    window.theme = window.theme || {};
+    window.theme.placeholderImages = {
+      product: "https://placehold.co/600x800/f8f8f8/999999?text=Product+Image",
+      collection: "https://placehold.co/1200x800/f8f8f8/999999?text=Collection+Image",
+      testimonial: "https://placehold.co/150x150/f8f8f8/999999?text=Customer",
+      banner: "https://placehold.co/1600x600/f8f8f8/999999?text=Banner+Image",
+      logo: "https://placehold.co/300x100/f8f8f8/999999?text=Logo",
+      guide: "https://placehold.co/600x400/f8f8f8/999999?text=Guide+Image",
+      lighter: "https://picsum.photos/600/400",
+      lighterbanner: "https://picsum.photos/1600/600",
+      customerAvatar: "https://randomuser.me/api/portraits/men/32.jpg"
+    };
+  </script>
+</head>
+<body>
+  {% section 'announcement-bar' %}
+  {% section 'header' %}
+  
+  <main role="main">
+    {{ content_for_layout }}
+  </main>
+  
+  {% section 'footer' %}
+  
+  {% render 'global-testimonials' %}
+  
+  <!-- Image optimization script -->
+  <script>
+    // Helper function to set placeholder images
+    function setPlaceholders() {
+      document.querySelectorAll('img[data-placeholder]').forEach(img => {
+        const type = img.getAttribute('data-placeholder');
+        if (window.theme.placeholderImages[type]) {
+          img.src = window.theme.placeholderImages[type];
+        }
+      });
+    }
+    
+    // Compress images with proper sizing and format
+    function optimizeImages() {
+      document.querySelectorAll('img[data-optimize="true"]').forEach(img => {
+        // Get original src
+        const originalSrc = img.getAttribute('data-original-src');
+        if (!originalSrc) return;
+        
+        // Add image optimization parameters for Shopify CDN
+        const width = img.getAttribute('data-width') || '800';
+        const height = img.getAttribute('data-height') || '';
+        const crop = img.getAttribute('data-crop') || 'center';
+        const format = img.getAttribute('data-format') || 'jpg';
+        
+        // Construct optimized URL
+        // Note: This is a simplified version, actual implementation will depend on your CDN
+        if (originalSrc.includes('cdn.shopify.com')) {
+          img.src = originalSrc.replace(/\.(jpg|jpeg|png|gif)/i, `_${width}x${height}_crop_${crop}.${format}`);
+        }
+      });
+    }
+    
+    // Run when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      setPlaceholders();
+      optimizeImages();
+    });
+  </script>
+  
+  {{ content_for_footer }}
+  {{ 'theme.js' | asset_url | script_tag }}
+</body>
+</html> 

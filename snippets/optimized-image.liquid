@@ -1,0 +1,91 @@
+{% comment %}
+  Optimized Image Snippet
+  
+  Parameters:
+  - image: The image object
+  - placeholder_type: Type of placeholder to use (product, collection, testimonial, banner, logo, guide, lighter, customerAvatar)
+  - class: Additional classes to add to the image
+  - width: Image width
+  - height: Image height
+  - crop: Cropping style (center, top, bottom, left, right)
+  - alt: Alt text for the image
+  - lazy: Whether to lazy load the image (default: true)
+  
+  Usage:
+  {% render 'optimized-image', 
+    image: product.featured_image,
+    placeholder_type: 'product',
+    class: 'product-image',
+    width: 600,
+    height: 800,
+    crop: 'center',
+    alt: product.title
+  %}
+{% endcomment %}
+
+{% assign alt_text = alt | default: 'Shopify image' %}
+{% assign lazy_load = lazy | default: true %}
+{% assign image_crop = crop | default: 'center' %}
+{% assign img_class = class | default: '' %}
+{% assign img_width = width | default: '800' %}
+{% assign img_height = height | default: '' %}
+
+<div class="optimized-image-container {% if image == blank %}placeholder-image{% endif %}" style="
+  {% if width %}max-width: {{ width }}px;{% endif %}
+  {% if width and height %}aspect-ratio: {{ width }}/{{ height }};{% endif %}
+">
+  {% if image != blank %}
+    <img
+      src="{{ image | img_url: '50x50', crop: image_crop }}"
+      data-original-src="{{ image.src }}"
+      data-optimize="true"
+      data-width="{{ img_width }}"
+      data-height="{{ img_height }}"
+      data-crop="{{ image_crop }}"
+      {% if lazy_load %}loading="lazy"{% endif %}
+      {% if lazy_load %}class="lazyload {{ img_class }}"{% else %}class="{{ img_class }}"{% endif %}
+      {% if lazy_load %}data-srcset="
+        {{ image | img_url: '300x', crop: image_crop }} 300w,
+        {{ image | img_url: '600x', crop: image_crop }} 600w,
+        {{ image | img_url: '900x', crop: image_crop }} 900w,
+        {{ image | img_url: '1200x', crop: image_crop }} 1200w,
+        {{ image | img_url: '1600x', crop: image_crop }} 1600w
+      "{% endif %}
+      data-sizes="auto"
+      alt="{{ alt_text }}"
+      width="{{ img_width }}"
+      {% if img_height != '' %}height="{{ img_height }}"{% endif %}
+    >
+  {% else %}
+    <img
+      src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+      data-placeholder="{{ placeholder_type }}"
+      class="placeholder {{ img_class }}"
+      alt="{{ alt_text }}"
+      width="{{ img_width }}"
+      {% if img_height != '' %}height="{{ img_height }}"{% endif %}
+    >
+  {% endif %}
+</div>
+
+<style>
+  .optimized-image-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+  }
+  
+  .optimized-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .optimized-image-container.placeholder-image {
+    background-color: #f8f8f8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style> 

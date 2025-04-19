@@ -1,0 +1,131 @@
+<div class="collection-template">
+  <div class="page-width">
+    <div class="collection-header">
+      <h1>{{ collection.title }}</h1>
+      {% if collection.description != blank %}
+        <div class="collection-description">
+          {{ collection.description }}
+        </div>
+      {% endif %}
+    </div>
+    
+    <div class="collections-toolbar">
+      <div class="view-options">
+        <button class="view-btn grid-view active" aria-label="Grid view">
+          {% render 'icon-grid' %}
+        </button>
+        <button class="view-btn list-view" aria-label="List view">
+          {% render 'icon-list' %}
+        </button>
+      </div>
+      
+      <div class="filter-toolbar">
+        <button class="filter-toggle" aria-expanded="false">
+          <span>Filter</span>
+          {% render 'icon-filter' %}
+        </button>
+        
+        <div class="sort-by">
+          <select name="sort_by" id="sort_by">
+            <option value="manual">Featured</option>
+            <option value="price-ascending">Price, low to high</option>
+            <option value="price-descending">Price, high to low</option>
+            <option value="title-ascending">Alphabetically, A-Z</option>
+            <option value="title-descending">Alphabetically, Z-A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    
+    <div class="collection-layout">
+      <div class="filter-sidebar" id="filter-sidebar">
+        <div class="filter-header">
+          <h3>Filter Products</h3>
+          <button class="close-filter">&times;</button>
+        </div>
+        
+        {% for filter in collection.filters %}
+          <div class="filter-group">
+            <h4 class="filter-title">{{ filter.label }}</h4>
+            <ul class="filter-options">
+              {% for value in filter.values %}
+                <li>
+                  <label class="filter-checkbox">
+                    <input type="checkbox" 
+                           name="{{ filter.label | handleize }}" 
+                           value="{{ value.value }}"
+                           {% if value.active %}checked{% endif %}>
+                    <span class="checkbox-custom"></span>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+        
+        <div class="filter-actions">
+          <button class="btn apply-filters">Apply Filters</button>
+          <button class="btn clear-filters">Clear All</button>
+        </div>
+      </div>
+      
+      <div class="collection-content">
+        {% paginate collection.products by 24 %}
+          <div class="products-grid grid-view-active">
+            {% for product in collection.products %}
+              <div class="product-card">
+                <div class="product-card__image">
+                  <a href="{{ product.url }}">
+                    <img src="{{ product.featured_image | img_url: '400x' }}" 
+                         alt="{{ product.featured_image.alt | escape }}"
+                         loading="lazy">
+                  </a>
+                  {% if product.compare_at_price > product.price %}
+                    <span class="sale-badge">Sale</span>
+                  {% endif %}
+                  <div class="quick-actions">
+                    <button class="quick-view-btn" data-product-id="{{ product.id }}">Quick View</button>
+                    <button class="wishlist-btn" data-product-id="{{ product.id }}">
+                      {% render 'icon-heart' %}
+                    </button>
+                  </div>
+                </div>
+                
+                <div class="product-card__info">
+                  <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                  <div class="product-card__price">
+                    <span class="price">{{ product.price | money }}</span>
+                    {% if product.compare_at_price > product.price %}
+                      <span class="compare-at-price">{{ product.compare_at_price | money }}</span>
+                    {% endif %}
+                  </div>
+                  <div class="product-card__description">
+                    {{ product.description | strip_html | truncatewords: 30 }}
+                  </div>
+                  <form method="post" action="/cart/add" class="product-form">
+                    <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                    <button type="submit" class="add-to-cart-btn"
+                            {% unless product.available %}disabled{% endunless %}>
+                      {% if product.available %}
+                        Add to Cart
+                      {% else %}
+                        Sold Out
+                      {% endif %}
+                    </button>
+                  </form>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          {% if paginate.pages > 1 %}
+            <div class="pagination">
+              {{ paginate | default_pagination }}
+            </div>
+          {% endif %}
+        {% endpaginate %}
+      </div>
+    </div>
+  </div>
+</div> 

@@ -1,0 +1,396 @@
+{% if section.settings.product_collection != blank %}
+  {% assign collection = collections[section.settings.product_collection] %}
+  {% if collection != empty %}
+    <div class="maintenance-related-products" style="background-color: {{ section.settings.background_color }}">
+      <div class="page-width">
+        <div class="section-header">
+          <h2>{{ section.settings.title }}</h2>
+          {% if section.settings.subtitle %}
+            <p class="subtitle">{{ section.settings.subtitle }}</p>
+          {% endif %}
+        </div>
+        
+        {% if section.settings.show_filters %}
+          {% comment %}
+          Extract unique product types or tags to use as filters
+          {% endcomment %}
+          {% assign filter_values = '' %}
+          {% for product in collection.products limit: section.settings.number_of_products %}
+            {% if section.settings.filter_by == 'product_type' %}
+              {% assign filter_value = product.type %}
+            {% else %}
+              {% assign filter_value = product.tags | first %}
+            {% endif %}
+            
+            {% unless filter_values contains filter_value %}
+              {% assign filter_values = filter_values | append: filter_value | append: ',' %}
+            {% endunless %}
+          {% endfor %}
+          
+          <div class="maintenance-products-filters">
+            <button class="product-filter-btn active" data-filter="all">All Products</button>
+            {% assign filter_array = filter_values | split: ',' %}
+            {% for filter in filter_array %}
+              {% if filter != blank %}
+                <button class="product-filter-btn" data-filter="{{ filter | handleize }}">{{ filter }}</button>
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% endif %}
+        
+        <div class="maintenance-products-grid">
+          {% for product in collection.products limit: section.settings.number_of_products %}
+            {% if section.settings.filter_by == 'product_type' %}
+              {% assign filter_value = product.type | handleize %}
+            {% else %}
+              {% assign filter_value = product.tags | first | handleize %}
+            {% endif %}
+            
+            <div class="maintenance-product-card" data-category="{{ filter_value }}">
+              <a href="{{ product.url }}" class="product-image-link">
+                {% if product.featured_image != blank %}
+                  <div class="product-image">
+                    <img src="{{ product.featured_image | img_url: '400x' }}" 
+                        alt="{{ product.title }}"
+                        loading="lazy">
+                    
+                    {% if product.compare_at_price > product.price %}
+                      <span class="sale-badge">Sale</span>
+                    {% endif %}
+                  </div>
+                {% endif %}
+              </a>
+              
+              <div class="product-info">
+                <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                
+                <div class="product-price">
+                  <span class="price">{{ product.price | money }}</span>
+                  {% if product.compare_at_price > product.price %}
+                    <span class="compare-at-price">{{ product.compare_at_price | money }}</span>
+                  {% endif %}
+                </div>
+                
+                {% if filter_value != blank and section.settings.show_category_tags %}
+                  <div class="product-category">
+                    <span class="category-tag">{{ filter_value | replace: '-', ' ' | capitalize }}</span>
+                  </div>
+                {% endif %}
+                
+                {% if section.settings.show_description %}
+                  <div class="product-description">
+                    {{ product.description | strip_html | truncatewords: 20 }}
+                  </div>
+                {% endif %}
+                
+                <div class="product-actions">
+                  <a href="{{ product.url }}" class="view-product-btn">View Product</a>
+                  
+                  {% if section.settings.show_quick_add and product.available %}
+                    <button type="button" 
+                           class="quick-add-btn"
+                           data-product-id="{{ product.id }}"
+                           aria-label="Add {{ product.title }} to cart">
+                      <i class="fa-solid fa-cart-plus"></i>
+                    </button>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        
+        {% if section.settings.show_view_all_button %}
+          <div class="view-all-container">
+            <a href="{{ collection.url }}" class="view-all-btn">
+              {{ section.settings.view_all_text }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+
+<style>
+  .maintenance-related-products {
+    padding: var(--spacing-xl) 0;
+  }
+  
+  .maintenance-products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+  }
+  
+  .maintenance-product-card {
+    background: var(--background-color);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .maintenance-product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  .product-image {
+    position: relative;
+    padding-bottom: 100%;
+  }
+  
+  .product-image img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .sale-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: var(--accent-color);
+    color: white;
+    padding: 4px 8px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8em;
+    font-weight: 500;
+  }
+  
+  .product-info {
+    padding: var(--spacing-md);
+  }
+  
+  .product-info h3 {
+    margin: 0 0 10px;
+    font-size: 1.2em;
+  }
+  
+  .product-info h3 a {
+    color: var(--primary-color);
+    text-decoration: none;
+  }
+  
+  .product-price {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .price {
+    font-weight: 600;
+    color: var(--accent-color);
+  }
+  
+  .compare-at-price {
+    color: var(--text-light-color);
+    text-decoration: line-through;
+    font-size: 0.9em;
+  }
+  
+  .product-description {
+    font-size: 0.9em;
+    color: var(--text-light-color);
+    margin-bottom: 15px;
+    line-height: 1.5;
+  }
+  
+  .product-actions {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .view-product-btn {
+    display: block;
+    flex: 1;
+    background: var(--accent-color);
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background 0.2s ease;
+  }
+  
+  .view-product-btn:hover {
+    background: color-mix(in srgb, var(--accent-color), black 15%);
+  }
+  
+  .quick-add-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  
+  .quick-add-btn:hover {
+    background: var(--primary-color);
+    color: white;
+  }
+  
+  .view-all-container {
+    text-align: center;
+    margin-top: var(--spacing-md);
+  }
+  
+  .view-all-btn {
+    display: inline-block;
+    padding: 12px 25px;
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    border-radius: var(--border-radius-sm);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  
+  .view-all-btn:hover {
+    background: var(--accent-color);
+    color: white;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .maintenance-products-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .maintenance-products-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .product-category {
+    margin-bottom: 15px;
+  }
+  
+  .category-tag {
+    display: inline-block;
+    background: var(--background-light);
+    padding: 5px 10px;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8em;
+    color: var(--text-light-color);
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Maintenance Products",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Recommended Maintenance Products"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Quality products to keep your lighter in perfect condition"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "number_of_products",
+      "label": "Number of products",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Filtering Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Show product filters",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "filter_by",
+      "label": "Filter products by",
+      "options": [
+        {
+          "value": "product_type",
+          "label": "Product type"
+        },
+        {
+          "value": "tag",
+          "label": "Product tag"
+        }
+      ],
+      "default": "product_type"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_category_tags",
+      "label": "Show category tags",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Product Display Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show product description",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_quick_add",
+      "label": "Show quick add button",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all_button",
+      "label": "Show 'View all' button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "view_all_text",
+      "label": "View all button text",
+      "default": "View All Products"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Maintenance Products"
+    }
+  ]
+}
+{% endschema %} 

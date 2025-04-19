@@ -1,0 +1,47 @@
+<div id="age-verification-popup" class="age-verification-popup{% if customer.tags contains 'age-verified' %} hidden{% endif %}">
+  <div class="age-verification-content">
+    <div class="age-icon">
+      {% render 'icon-lighter' %}
+    </div>
+    <h2>{{ settings.age_verification_title | default: 'Age Verification' }}</h2>
+    <p>{{ settings.age_verification_message | default: 'This website sells products intended for adults 21 years or older. By entering, you confirm you are at least 21 years of age.' }}</p>
+    
+    <div class="age-verification-buttons">
+      <button id="age-verify-yes" class="btn-primary">{{ settings.age_verification_confirm | default: 'I am 21 or older' }}</button>
+      <button id="age-verify-no" class="btn-secondary">{{ settings.age_verification_decline | default: 'I am under 21' }}</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const popup = document.getElementById('age-verification-popup');
+    const confirmBtn = document.getElementById('age-verify-yes');
+    const declineBtn = document.getElementById('age-verify-no');
+    
+    // Check if user has previously verified
+    if (!localStorage.getItem('age-verified')) {
+      popup.classList.remove('hidden');
+      document.body.classList.add('no-scroll');
+    }
+    
+    confirmBtn.addEventListener('click', function() {
+      localStorage.setItem('age-verified', 'true');
+      popup.classList.add('hidden');
+      document.body.classList.remove('no-scroll');
+      
+      // Optional: Send verification to server
+      fetch('/apps/age-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ verified: true })
+      });
+    });
+    
+    declineBtn.addEventListener('click', function() {
+      window.location.href = '{{ settings.age_verification_redirect | default: "https://www.google.com" }}';
+    });
+  });
+</script> 

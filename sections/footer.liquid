@@ -1,0 +1,217 @@
+<footer class="site-footer">
+  <div class="page-width">
+    <div class="footer-top">
+      <div class="footer-logo">
+        {% if section.settings.footer_logo != blank %}
+          <img src="{{ section.settings.footer_logo | img_url: 'medium' }}" alt="{{ shop.name }}">
+        {% else %}
+          <span class="site-name">{{ shop.name }}</span>
+        {% endif %}
+        
+        {% if section.settings.tagline != blank %}
+          <p class="tagline">{{ section.settings.tagline }}</p>
+        {% endif %}
+      </div>
+      
+      <div class="footer-newsletter">
+        <h3>{{ section.settings.newsletter_title }}</h3>
+        {% form 'customer', id: 'footer-newsletter' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="newsletter-form">
+            <input type="email" 
+                  name="contact[email]" 
+                  placeholder="{{ section.settings.newsletter_placeholder }}"
+                  required>
+            <button type="submit">{{ section.settings.newsletter_button_text }}</button>
+          </div>
+        {% endform %}
+      </div>
+    </div>
+    
+    <div class="footer-menus">
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when 'link_list' %}
+            <div class="footer-menu" {{ block.shopify_attributes }}>
+              <h4>{{ block.settings.title }}</h4>
+              <ul>
+                {% for link in linklists[block.settings.menu].links %}
+                  <li>
+                    <a href="{{ link.url }}">{{ link.title }}</a>
+                  </li>
+                {% endfor %}
+              </ul>
+            </div>
+          {% when 'text' %}
+            <div class="footer-text" {{ block.shopify_attributes }}>
+              <h4>{{ block.settings.title }}</h4>
+              <div class="rte">
+                {{ block.settings.text }}
+              </div>
+              {% if block.settings.show_social %}
+                <div class="social-links">
+                  {% if settings.social_instagram_link != blank %}
+                    <a href="{{ settings.social_instagram_link }}" aria-label="Instagram">
+                      {% render 'icon-instagram' %}
+                    </a>
+                  {% endif %}
+                  {% if settings.social_facebook_link != blank %}
+                    <a href="{{ settings.social_facebook_link }}" aria-label="Facebook">
+                      {% render 'icon-facebook' %}
+                    </a>
+                  {% endif %}
+                  {% if settings.social_twitter_link != blank %}
+                    <a href="{{ settings.social_twitter_link }}" aria-label="Twitter">
+                      {% render 'icon-twitter' %}
+                    </a>
+                  {% endif %}
+                </div>
+              {% endif %}
+            </div>
+        {% endcase %}
+      {% endfor %}
+    </div>
+    
+    <div class="footer-bottom">
+      <div class="copyright">
+        {{ section.settings.copyright_text | replace: '[year]', 'now' | date: "%Y" }}
+      </div>
+      
+      <div class="payment-icons">
+        {% for type in shop.enabled_payment_types %}
+          {{ type | payment_type_svg_tag: class: 'payment-icon' }}
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if section.settings.show_age_verification %}
+      <div class="age-verification">
+        <span class="age-icon">🔞</span>
+        <p>{{ section.settings.age_verification_text }}</p>
+      </div>
+    {% endif %}
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "footer_logo",
+      "label": "Footer Logo"
+    },
+    {
+      "type": "text",
+      "id": "tagline",
+      "label": "Tagline",
+      "default": "Premium Lighters & Smoking Accessories"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "© [year] Your Store. All rights reserved."
+    },
+    {
+      "type": "header",
+      "content": "Newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_title",
+      "label": "Newsletter title",
+      "default": "Subscribe to our newsletter"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Email placeholder text",
+      "default": "Your email"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_text",
+      "label": "Button text",
+      "default": "Subscribe"
+    },
+    {
+      "type": "header",
+      "content": "Age Verification"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_age_verification",
+      "label": "Show age verification notice",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "age_verification_text",
+      "label": "Age verification text",
+      "default": "Products on this site are intended for adults 21 years or older. By entering, you confirm you are at least 21 years of age."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "link_list",
+      "name": "Menu",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "Quick links"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu",
+          "default": "footer"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Heading",
+          "default": "About our store"
+        },
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "Text",
+          "default": "<p>Share store details, promotions, or brand content with your customers.</p>"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_social",
+          "label": "Show social icons",
+          "default": true
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer",
+      "blocks": [
+        {
+          "type": "link_list"
+        },
+        {
+          "type": "text"
+        },
+        {
+          "type": "link_list"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

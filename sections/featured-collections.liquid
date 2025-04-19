@@ -1,0 +1,114 @@
+<div class="featured-collections" id="collection-section">
+  <div class="page-width">
+    <div class="collections-header">
+      <h2>{{ section.settings.title }}</h2>
+      
+      <div class="filter-toolbar">
+        <button class="filter-toggle" aria-expanded="false">
+          <span>Filter</span>
+          {% render 'icon-filter' %}
+        </button>
+        
+        <div class="sort-by">
+          <select name="sort_by" id="sort_by">
+            <option value="manual">Featured</option>
+            <option value="price-ascending">Price, low to high</option>
+            <option value="price-descending">Price, high to low</option>
+            <option value="title-ascending">Alphabetically, A-Z</option>
+            <option value="title-descending">Alphabetically, Z-A</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="collection-layout">
+      <div class="filter-sidebar" id="filter-sidebar">
+        {% for filter in collection.filters %}
+          <div class="filter-group">
+            <h3>{{ filter.label }}</h3>
+            <ul class="filter-options">
+              {% for value in filter.values %}
+                <li>
+                  <label class="filter-checkbox">
+                    <input type="checkbox" 
+                           name="{{ filter.label | handleize }}" 
+                           value="{{ value.value }}"
+                           {% if value.active %}checked{% endif %}>
+                    <span class="checkbox-custom"></span>
+                    {{ value.label }} ({{ value.count }})
+                  </label>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="products-grid">
+        {% paginate collection.products by section.settings.products_per_page %}
+          <div class="grid-container">
+            {% for product in collection.products %}
+              <div class="product-card">
+                <div class="product-card__image">
+                  <a href="{{ product.url }}">
+                    <img src="{{ product.featured_image | img_url: '400x' }}" 
+                         alt="{{ product.featured_image.alt | escape }}"
+                         loading="lazy">
+                  </a>
+                  {% if product.compare_at_price > product.price %}
+                    <span class="sale-badge">Sale</span>
+                  {% endif %}
+                </div>
+                
+                <div class="product-card__info">
+                  <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                  <div class="product-card__price">
+                    <span class="price">{{ product.price | money }}</span>
+                    {% if product.compare_at_price > product.price %}
+                      <span class="compare-at-price">{{ product.compare_at_price | money }}</span>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+          
+          {% if paginate.pages > 1 %}
+            <div class="pagination">
+              {{ paginate | default_pagination }}
+            </div>
+          {% endif %}
+        {% endpaginate %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured Collections",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Section Title",
+      "default": "Our Collections"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "label": "Products per page",
+      "default": 12
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Collections",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %} 

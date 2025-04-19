@@ -1,0 +1,228 @@
+{% assign faq_schema = section.blocks | map: 'settings' %}
+
+<div class="faq-section" style="background-color: {{ section.settings.background_color }}">
+  <div class="page-width">
+    <div class="section-header">
+      <h2>{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle %}
+        <p class="subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+
+    <div class="faq-container">
+      <div class="faq-categories">
+        {% assign categories = '' %}
+        {% for block in section.blocks %}
+          {% assign category = block.settings.category %}
+          {% unless categories contains category %}
+            {% assign categories = categories | append: category | append: ',' %}
+            <button class="category-btn{% if forloop.first %} active{% endif %}" data-category="{{ category }}">
+              {% if block.settings.category_icon %}
+                <span class="category-icon">{{ block.settings.category_icon }}</span>
+              {% endif %}
+              {{ category }}
+            </button>
+          {% endunless %}
+        {% endfor %}
+      </div>
+
+      <div class="faq-content">
+        {% for block in section.blocks %}
+          <div class="faq-item" data-category="{{ block.settings.category }}" {{ block.shopify_attributes }}>
+            <button class="faq-question" aria-expanded="false">
+              <span class="question-text">{{ block.settings.question }}</span>
+              <span class="icon-plus">+</span>
+              <span class="icon-minus">−</span>
+            </button>
+            <div class="faq-answer">
+              <div class="answer-content">
+                {{ block.settings.answer }}
+                {% if block.settings.cta_text != blank and block.settings.cta_link != blank %}
+                  <a href="{{ block.settings.cta_link }}" class="faq-cta">{{ block.settings.cta_text }}</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    {% if section.settings.show_contact_info %}
+      <div class="faq-contact">
+        <p>{{ section.settings.contact_text }}</p>
+        <a href="{{ section.settings.contact_button_link }}" class="contact-button">
+          {{ section.settings.contact_button_text }}
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const faqSection = document.querySelector('.faq-section');
+  const categoryBtns = faqSection.querySelectorAll('.category-btn');
+  const faqItems = faqSection.querySelectorAll('.faq-item');
+  const questions = faqSection.querySelectorAll('.faq-question');
+
+  // Category filter functionality
+  categoryBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const category = btn.dataset.category;
+      
+      // Update active button
+      categoryBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Show/hide FAQ items
+      faqItems.forEach(item => {
+        if (item.dataset.category === category) {
+          item.style.display = 'block';
+        } else {
+          item.style.display = 'none';
+        }
+      });
+    });
+  });
+
+  // Accordion functionality
+  questions.forEach(question => {
+    question.addEventListener('click', () => {
+      const answer = question.nextElementSibling;
+      const isExpanded = question.getAttribute('aria-expanded') === 'true';
+      
+      // Close other questions
+      questions.forEach(q => {
+        if (q !== question) {
+          q.setAttribute('aria-expanded', 'false');
+          q.nextElementSibling.style.maxHeight = null;
+        }
+      });
+      
+      // Toggle current question
+      question.setAttribute('aria-expanded', !isExpanded);
+      if (!isExpanded) {
+        answer.style.maxHeight = answer.scrollHeight + 'px';
+      } else {
+        answer.style.maxHeight = null;
+      }
+    });
+  });
+
+  // Initialize with first category
+  if (categoryBtns.length > 0) {
+    categoryBtns[0].click();
+  }
+});
+</script>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Find answers to common questions about our products"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Contact Information"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_contact_info",
+      "label": "Show contact section",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "contact_text",
+      "label": "Contact text",
+      "default": "Can't find what you're looking for? We're here to help!"
+    },
+    {
+      "type": "text",
+      "id": "contact_button_text",
+      "label": "Contact button text",
+      "default": "Contact Us"
+    },
+    {
+      "type": "url",
+      "id": "contact_button_link",
+      "label": "Contact button link"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "category",
+          "label": "Category",
+          "default": "General"
+        },
+        {
+          "type": "text",
+          "id": "category_icon",
+          "label": "Category Icon",
+          "default": "🔥"
+        },
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "How do I refill my lighter?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>To refill your lighter, first ensure it's completely empty. Hold it upside down, insert the butane can nozzle, and press firmly for 5 seconds. Wait a few minutes before use to let the fuel settle.</p>"
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Call-to-action text"
+        },
+        {
+          "type": "url",
+          "id": "cta_link",
+          "label": "Call-to-action link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ",
+      "blocks": [
+        {
+          "type": "faq_item"
+        },
+        {
+          "type": "faq_item"
+        },
+        {
+          "type": "faq_item"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

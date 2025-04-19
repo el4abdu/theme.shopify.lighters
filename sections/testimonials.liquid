@@ -1,0 +1,409 @@
+{%- if section.settings.use_global_testimonials -%}
+  {%- render 'global-testimonials' -%}
+{%- else -%}
+  <div class="testimonials-section"
+    style="background-color: {{ section.settings.background_color }}; color: {{ section.settings.text_color }};">
+    <div class="page-width">
+      {%- if section.settings.title != blank -%}
+        <h2 class="testimonials-title h1">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      
+      {%- if section.settings.subtitle != blank -%}
+        <div class="testimonials-subtitle">{{ section.settings.subtitle }}</div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="testimonials-slider" data-auto-scroll="{{ section.settings.auto_scroll }}">
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'testimonial' -%}
+              <div class="testimonial-item" {{ block.shopify_attributes }}>
+                <div class="testimonial-card" style="background-color: {{ section.settings.card_background }};">
+                  <div class="testimonial-content">
+                    {%- if block.settings.quote != blank -%}
+                      <div class="testimonial-quote">
+                        <span class="quote-mark" style="color: {{ section.settings.accent_color }};">&ldquo;</span>
+                        {{ block.settings.quote }}
+                        <span class="quote-mark" style="color: {{ section.settings.accent_color }};">&rdquo;</span>
+                      </div>
+                    {%- endif -%}
+                    
+                    {%- if block.settings.rating > 0 -%}
+                      <div class="testimonial-rating" style="color: {{ section.settings.accent_color }};">
+                        {%- for i in (1..5) -%}
+                          {%- if i <= block.settings.rating -%}
+                            <span class="star-filled">★</span>
+                          {%- else -%}
+                            <span class="star-empty">☆</span>
+                          {%- endif -%}
+                        {%- endfor -%}
+                      </div>
+                    {%- endif -%}
+                  </div>
+                  
+                  <div class="testimonial-author">
+                    <div class="author-image">
+                      {%- if block.settings.author_image != blank -%}
+                        {% render 'optimized-image',
+                          image: block.settings.author_image,
+                          placeholder_type: 'customerAvatar',
+                          width: 100,
+                          height: 100,
+                          crop: 'center',
+                          alt: block.settings.author_name
+                        %}
+                      {%- else -%}
+                        <img src="https://randomuser.me/api/portraits/men/{{ forloop.index | modulo: 99 }}.jpg" 
+                             alt="{{ block.settings.author_name }}" 
+                             loading="lazy">
+                      {%- endif -%}
+                    </div>
+                    
+                    <div class="author-details">
+                      {%- if block.settings.author_name != blank -%}
+                        <div class="author-name">{{ block.settings.author_name }}</div>
+                      {%- endif -%}
+                      
+                      {%- if block.settings.author_title != blank -%}
+                        <div class="author-title">{{ block.settings.author_title }}</div>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- endif -%}
+      
+      {%- if section.settings.cta_text != blank and section.settings.cta_link != blank -%}
+        <div class="testimonial-cta">
+          <a href="{{ section.settings.cta_link }}" class="button"
+             style="background-color: {{ section.settings.accent_color }}; color: {{ section.settings.cta_text_color }};">
+            {{ section.settings.cta_text }}
+          </a>
+        </div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <style>
+    .testimonials-section {
+      padding: 60px 0;
+      text-align: center;
+    }
+    
+    .testimonials-title {
+      margin-bottom: 15px;
+    }
+    
+    .testimonials-subtitle {
+      margin-bottom: 40px;
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    
+    .testimonials-slider {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      margin: 0 -15px 30px;
+      padding-bottom: 20px;
+    }
+    
+    .testimonial-item {
+      flex: 0 0 100%;
+      padding: 0 15px;
+      scroll-snap-align: start;
+    }
+    
+    .testimonial-card {
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      padding: 30px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    
+    .testimonial-quote {
+      font-size: 16px;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    
+    .quote-mark {
+      font-size: 60px;
+      line-height: 0;
+      position: relative;
+      top: 20px;
+      opacity: 0.5;
+    }
+    
+    .testimonial-rating {
+      margin-bottom: 20px;
+    }
+    
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      margin-top: 20px;
+    }
+    
+    .author-image {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+    
+    .author-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .author-details {
+      text-align: left;
+    }
+    
+    .author-name {
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .author-title {
+      font-size: 14px;
+      opacity: 0.8;
+    }
+    
+    .testimonial-cta {
+      margin-top: 30px;
+    }
+    
+    @media screen and (min-width: 768px) {
+      .testimonials-slider {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+        overflow: visible;
+        margin: 0 0 40px;
+      }
+      
+      .testimonial-item {
+        padding: 0;
+      }
+    }
+    
+    @media screen and (min-width: 990px) {
+      .testimonials-slider {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+  </style>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const slider = document.querySelector('.testimonials-slider');
+      if (!slider) return;
+      
+      const autoScroll = slider.dataset.autoScroll === 'true';
+      
+      if (autoScroll && window.innerWidth < 768) {
+        let scrollPosition = 0;
+        const scrollAmount = slider.scrollWidth / slider.children.length;
+        const maxScroll = slider.scrollWidth - slider.clientWidth;
+        
+        setInterval(() => {
+          scrollPosition += scrollAmount;
+          if (scrollPosition > maxScroll) {
+            scrollPosition = 0;
+          }
+          
+          slider.scrollTo({
+            left: scrollPosition,
+            behavior: 'smooth'
+          });
+        }, 5000);
+      }
+      
+      // Add mouse drag scrolling for mobile
+      if (window.innerWidth < 768) {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+        
+        slider.addEventListener('mousedown', (e) => {
+          isDown = true;
+          slider.style.cursor = 'grabbing';
+          startX = e.pageX - slider.offsetLeft;
+          scrollLeft = slider.scrollLeft;
+        });
+        
+        slider.addEventListener('mouseleave', () => {
+          isDown = false;
+          slider.style.cursor = 'grab';
+        });
+        
+        slider.addEventListener('mouseup', () => {
+          isDown = false;
+          slider.style.cursor = 'grab';
+        });
+        
+        slider.addEventListener('mousemove', (e) => {
+          if (!isDown) return;
+          e.preventDefault();
+          const x = e.pageX - slider.offsetLeft;
+          const walk = (x - startX) * 2;
+          slider.scrollLeft = scrollLeft - walk;
+        });
+      }
+    });
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "use_global_testimonials",
+      "label": "Use global testimonials",
+      "default": true,
+      "info": "Use the global testimonials configuration from theme settings"
+    },
+    {
+      "type": "header",
+      "content": "Section Specific Settings",
+      "info": "These settings apply when not using global testimonials"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Customer Testimonials"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "See what our customers are saying about us"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Card background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#f2994a"
+    },
+    {
+      "type": "checkbox",
+      "id": "auto_scroll",
+      "label": "Auto-scroll on mobile",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "Button text",
+      "default": "Leave a Review"
+    },
+    {
+      "type": "url",
+      "id": "cta_link",
+      "label": "Button link"
+    },
+    {
+      "type": "color",
+      "id": "cta_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "testimonial",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "I absolutely love this product! It has made a significant difference in my life and I recommend it to all my friends."
+        },
+        {
+          "type": "range",
+          "id": "rating",
+          "min": 0,
+          "max": 5,
+          "step": 1,
+          "label": "Rating",
+          "default": 5
+        },
+        {
+          "type": "image_picker",
+          "id": "author_image",
+          "label": "Author image"
+        },
+        {
+          "type": "text",
+          "id": "author_name",
+          "label": "Author name",
+          "default": "Jane Doe"
+        },
+        {
+          "type": "text",
+          "id": "author_title",
+          "label": "Author title",
+          "default": "Verified Customer"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Testimonials",
+      "blocks": [
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        },
+        {
+          "type": "testimonial"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

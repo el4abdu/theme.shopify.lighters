@@ -1,0 +1,491 @@
+{% assign guide_schema = section.blocks | map: 'settings' %}
+
+<div class="maintenance-guide" style="background-color: {{ section.settings.background_color }};">
+  <div class="page-width">
+    <div class="maintenance-guide__header">
+      {% if section.settings.title != blank %}
+        <h2 class="maintenance-guide__title">{{ section.settings.title }}</h2>
+      {% endif %}
+      
+      {% if section.settings.subtitle != blank %}
+        <div class="maintenance-guide__subtitle">{{ section.settings.subtitle }}</div>
+      {% endif %}
+    </div>
+
+    {% if section.blocks.size > 0 %}
+      <div class="maintenance-guide__grid">
+        {% for block in section.blocks %}
+          {% if block.type == 'guide_item' %}
+            <div class="guide-item" {{ block.shopify_attributes }}>
+              <div class="guide-item__content">
+                {% if block.settings.item_title != blank %}
+                  <h3 class="guide-item__title">
+                    <span class="guide-item__number">{{ forloop.index }}</span>
+                    {{ block.settings.item_title }}
+                  </h3>
+                {% endif %}
+                
+                <div class="guide-item__media">
+                  {% if block.settings.item_media != blank %}
+                    {% render 'optimized-image',
+                      image: block.settings.item_media,
+                      placeholder_type: 'lighter',
+                      width: 600,
+                      height: 400,
+                      alt: block.settings.item_title | escape
+                    %}
+                  {% else %}
+                    <img 
+                      src="https://picsum.photos/600/400?random={{ forloop.index }}" 
+                      alt="{{ block.settings.item_title | escape }}"
+                      loading="lazy"
+                      width="600"
+                      height="400">
+                  {% endif %}
+                </div>
+                
+                {% if block.settings.item_description != blank %}
+                  <div class="guide-item__description">
+                    {{ block.settings.item_description }}
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.pro_tip != blank %}
+                  <div class="guide-item__pro-tip">
+                    <span class="pro-tip__label">Pro Tip:</span>
+                    <p>{{ block.settings.pro_tip }}</p>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.warning != blank %}
+                  <div class="guide-item__warning">
+                    <span class="warning__label">⚠️ Warning:</span>
+                    <p>{{ block.settings.warning }}</p>
+                  </div>
+                {% endif %}
+                
+                {% if block.settings.recommended_product != blank %}
+                  {% assign product = all_products[block.settings.recommended_product] %}
+                  {% if product != blank %}
+                    <div class="guide-item__product">
+                      <span class="product__label">Recommended:</span>
+                      <a href="{{ product.url }}" class="product-link">
+                        <div class="product-image">
+                          {% if product.featured_image != blank %}
+                            {% render 'optimized-image',
+                              image: product.featured_image,
+                              placeholder_type: 'product',
+                              width: 100,
+                              height: 100,
+                              crop: 'center',
+                              alt: product.title
+                            %}
+                          {% else %}
+                            <img 
+                              src="https://picsum.photos/100/100?random={{ forloop.index }}p" 
+                              alt="{{ product.title }}"
+                              loading="lazy">
+                          {% endif %}
+                        </div>
+                        <div class="product-details">
+                          <span class="product-title">{{ product.title }}</span>
+                          <span class="product-price">{{ product.price | money }}</span>
+                        </div>
+                      </a>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+    {% endif %}
+    
+    {% assign schedule_blocks = section.blocks | where: 'type', 'schedule_item' %}
+    {% if schedule_blocks.size > 0 %}
+      <div class="maintenance-schedule">
+        <h3 class="maintenance-schedule__title">Maintenance Schedule</h3>
+        <div class="maintenance-schedule__table">
+          <div class="schedule-header">
+            <div class="schedule-column">Frequency</div>
+            <div class="schedule-column">Maintenance Task</div>
+          </div>
+          {% for block in schedule_blocks %}
+            <div class="schedule-row" {{ block.shopify_attributes }}>
+              <div class="schedule-column frequency">{{ block.settings.frequency }}</div>
+              <div class="schedule-column task">{{ block.settings.task }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+  .maintenance-guide {
+    padding: 60px 0;
+    color: {{ section.settings.text_color }};
+  }
+  
+  .maintenance-guide__header {
+    text-align: center;
+    margin-bottom: 50px;
+  }
+  
+  .maintenance-guide__title {
+    margin-bottom: 15px;
+    font-size: 32px;
+  }
+  
+  .maintenance-guide__subtitle {
+    max-width: 800px;
+    margin: 0 auto;
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  
+  .maintenance-guide__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .guide-item {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+  }
+  
+  .guide-item__content {
+    padding: 30px;
+  }
+  
+  .guide-item__title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+  }
+  
+  .guide-item__number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    background-color: {{ section.settings.accent_color }};
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+    font-size: 16px;
+  }
+  
+  .guide-item__media {
+    margin-bottom: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .guide-item__media img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+  
+  .guide-item__description {
+    margin-bottom: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+  
+  .guide-item__pro-tip,
+  .guide-item__warning {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 14px;
+  }
+  
+  .guide-item__pro-tip {
+    background-color: rgba(0, 128, 0, 0.1);
+    border-left: 4px solid green;
+  }
+  
+  .guide-item__warning {
+    background-color: rgba(255, 0, 0, 0.1);
+    border-left: 4px solid red;
+  }
+  
+  .pro-tip__label,
+  .warning__label,
+  .product__label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .guide-item__product {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #eee;
+  }
+  
+  .product-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: inherit;
+    margin-top: 10px;
+    transition: transform 0.2s;
+  }
+  
+  .product-link:hover {
+    transform: translateY(-2px);
+  }
+  
+  .product-image {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-right: 15px;
+    border: 1px solid #eee;
+  }
+  
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .product-details {
+    flex: 1;
+  }
+  
+  .product-title {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+  }
+  
+  .product-price {
+    color: {{ section.settings.accent_color }};
+    font-weight: bold;
+  }
+  
+  .maintenance-schedule {
+    margin-top: 60px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    padding: 30px;
+  }
+  
+  .maintenance-schedule__title {
+    margin-bottom: 20px;
+    text-align: center;
+    font-size: 24px;
+  }
+  
+  .maintenance-schedule__table {
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid #eee;
+  }
+  
+  .schedule-header {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    background-color: {{ section.settings.accent_color }};
+    color: #fff;
+    font-weight: bold;
+  }
+  
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .schedule-row:last-child {
+    border-bottom: none;
+  }
+  
+  .schedule-column {
+    padding: 12px 15px;
+  }
+  
+  .frequency {
+    font-weight: bold;
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+  
+  @media screen and (min-width: 768px) {
+    .maintenance-guide__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media screen and (min-width: 990px) {
+    .maintenance-guide__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Maintenance Guide",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Lighter Maintenance Guide"
+    },
+    {
+      "type": "textarea",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Follow these steps to ensure your lighter stays in optimal condition and performs reliably for years to come."
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background Color",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent Color",
+      "default": "#4a90e2"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "guide_item",
+      "name": "Maintenance Step",
+      "settings": [
+        {
+          "type": "text",
+          "id": "item_title",
+          "label": "Step Title",
+          "default": "Refilling Fuel"
+        },
+        {
+          "type": "image_picker",
+          "id": "item_media",
+          "label": "Step Image or Video"
+        },
+        {
+          "type": "richtext",
+          "id": "item_description",
+          "label": "Step Instructions",
+          "default": "<p>Turn the lighter upside down and locate the fuel inlet. Use high-quality butane and insert the nozzle firmly into the inlet. Press down for 3-5 seconds to fill.</p>"
+        },
+        {
+          "type": "textarea",
+          "id": "pro_tip",
+          "label": "Pro Tip",
+          "default": "For best results, purge all remaining gas before refilling by pressing the inlet valve with a small screwdriver until no hissing sound is heard."
+        },
+        {
+          "type": "textarea",
+          "id": "warning",
+          "label": "Warning",
+          "default": "Never refill near an open flame or heat source. Wait at least 5 minutes after refilling before attempting to light."
+        },
+        {
+          "type": "product",
+          "id": "recommended_product",
+          "label": "Recommended Product"
+        }
+      ]
+    },
+    {
+      "type": "schedule_item",
+      "name": "Schedule Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "frequency",
+          "label": "Frequency",
+          "default": "Every 2 weeks"
+        },
+        {
+          "type": "textarea",
+          "id": "task",
+          "label": "Maintenance Task",
+          "default": "Clean the jet nozzle with compressed air to remove any debris or buildup that may affect flame quality."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Maintenance Guide",
+      "category": "Custom Content",
+      "blocks": [
+        {
+          "type": "guide_item",
+          "settings": {
+            "item_title": "Refilling Fuel",
+            "item_description": "<p>Turn the lighter upside down and locate the fuel inlet. Use high-quality butane and insert the nozzle firmly into the inlet. Press down for 3-5 seconds to fill.</p>",
+            "pro_tip": "For best results, purge all remaining gas before refilling by pressing the inlet valve with a small screwdriver until no hissing sound is heard.",
+            "warning": "Never refill near an open flame or heat source. Wait at least 5 minutes after refilling before attempting to light."
+          }
+        },
+        {
+          "type": "guide_item",
+          "settings": {
+            "item_title": "Cleaning the Jet",
+            "item_description": "<p>Use compressed air or a fine needle to gently clean the jet nozzle. This removes debris that can block fuel flow and cause inconsistent flames.</p>",
+            "pro_tip": "Hold the lighter at a 45-degree angle when cleaning to help debris fall out rather than being pushed further in.",
+            "warning": "Never use excessive force when cleaning the jet as this can permanently damage the precision components."
+          }
+        },
+        {
+          "type": "guide_item",
+          "settings": {
+            "item_title": "Adjusting Flame Height",
+            "item_description": "<p>Locate the flame adjustment wheel or screw, usually on the bottom of the lighter. Use a small screwdriver to turn clockwise for a smaller flame or counterclockwise for a larger flame.</p>",
+            "pro_tip": "For optimal performance and fuel efficiency, keep the flame at a moderate height - approximately 1-2 inches.",
+            "warning": "Setting the flame too high can cause overheating and may damage internal components over time."
+          }
+        },
+        {
+          "type": "schedule_item",
+          "settings": {
+            "frequency": "After each use",
+            "task": "Wipe down the exterior with a soft, dry cloth to remove fingerprints and prevent buildup of oils."
+          }
+        },
+        {
+          "type": "schedule_item",
+          "settings": {
+            "frequency": "Weekly",
+            "task": "Check fuel level and refill if necessary. Inspect the flame for consistency and color."
+          }
+        },
+        {
+          "type": "schedule_item",
+          "settings": {
+            "frequency": "Monthly",
+            "task": "Clean the jet nozzle and inspect all components for wear or damage. Test all mechanisms for smooth operation."
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

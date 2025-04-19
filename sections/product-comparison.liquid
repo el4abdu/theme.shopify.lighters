@@ -1,0 +1,189 @@
+<div class="product-comparison" id="product-comparison-{{ section.id }}">
+  <div class="page-width">
+    <div class="section-header">
+      <h2>{{ section.settings.title }}</h2>
+      {% if section.settings.subtitle %}
+        <p class="subtitle">{{ section.settings.subtitle }}</p>
+      {% endif %}
+    </div>
+    
+    <div class="comparison-table-container">
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th class="feature-column">{{ section.settings.feature_column_title }}</th>
+            {% for block in section.blocks %}
+              {% if block.type == 'product' %}
+                {% assign product = all_products[block.settings.product] %}
+                {% if product != empty %}
+                  <th class="product-column" {{ block.shopify_attributes }}>
+                    <div class="product-image">
+                      <img src="{{ product.featured_image | img_url: '150x' }}" alt="{{ product.title }}">
+                    </div>
+                    <h3 class="product-title">{{ product.title }}</h3>
+                    <div class="product-price">{{ product.price | money }}</div>
+                  </th>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for feature in section.settings.features %}
+            <tr>
+              <td class="feature-name">{{ feature }}</td>
+              {% for block in section.blocks %}
+                {% if block.type == 'product' %}
+                  {% assign product = all_products[block.settings.product] %}
+                  {% if product != empty %}
+                    {% assign feature_key = feature | handleize %}
+                    {% assign feature_value = block.settings[feature_key] %}
+                    <td class="feature-value" {{ block.shopify_attributes }}>
+                      {% if feature_value %}
+                        {{ feature_value }}
+                      {% else %}
+                        <span class="not-applicable">N/A</span>
+                      {% endif %}
+                    </td>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            </tr>
+          {% endfor %}
+          <tr class="actions-row">
+            <td></td>
+            {% for block in section.blocks %}
+              {% if block.type == 'product' %}
+                {% assign product = all_products[block.settings.product] %}
+                {% if product != empty %}
+                  <td {{ block.shopify_attributes }}>
+                    <form method="post" action="/cart/add" class="product-form">
+                      <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+                      <button type="submit" class="add-to-cart-btn"
+                              {% unless product.available %}disabled{% endunless %}>
+                        {% if product.available %}
+                          {{ block.settings.button_text | default: 'Add to Cart' }}
+                        {% else %}
+                          {{ block.settings.sold_out_text | default: 'Sold Out' }}
+                        {% endif %}
+                      </button>
+                    </form>
+                    <a href="{{ product.url }}" class="view-details">View Details</a>
+                  </td>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Product Comparison",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Compare Lighters"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle",
+      "default": "Find the perfect lighter for your needs"
+    },
+    {
+      "type": "text",
+      "id": "feature_column_title",
+      "label": "Feature column title",
+      "default": "Features"
+    },
+    {
+      "type": "textarea",
+      "id": "features",
+      "label": "Comparison features (one per line)",
+      "default": "Material\nFuel Type\nFlame Type\nRefillable\nDimensions\nWeight\nSpecial Features"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Product",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "material",
+          "label": "Material"
+        },
+        {
+          "type": "text",
+          "id": "fuel-type",
+          "label": "Fuel Type"
+        },
+        {
+          "type": "text",
+          "id": "flame-type",
+          "label": "Flame Type"
+        },
+        {
+          "type": "text",
+          "id": "refillable",
+          "label": "Refillable"
+        },
+        {
+          "type": "text",
+          "id": "dimensions",
+          "label": "Dimensions"
+        },
+        {
+          "type": "text",
+          "id": "weight",
+          "label": "Weight"
+        },
+        {
+          "type": "text",
+          "id": "special-features",
+          "label": "Special Features"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Add to Cart text",
+          "default": "Add to Cart"
+        },
+        {
+          "type": "text",
+          "id": "sold_out_text",
+          "label": "Sold out text",
+          "default": "Sold Out"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Comparison",
+      "blocks": [
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        },
+        {
+          "type": "product"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %} 

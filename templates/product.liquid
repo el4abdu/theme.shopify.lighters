@@ -1,0 +1,171 @@
+<div class="product-template">
+  <div class="page-width">
+    <div class="breadcrumbs">
+      <a href="/">Home</a> / 
+      <a href="{{ product.collection.url }}">{{ product.collection.title }}</a> / 
+      <span>{{ product.title }}</span>
+    </div>
+    
+    <div class="product-container">
+      <div class="product-gallery">
+        <div class="product-main-image">
+          <img src="{{ product.featured_image | img_url: '600x' }}" 
+               alt="{{ product.featured_image.alt | escape }}" 
+               id="main-product-image">
+        </div>
+        
+        {% if product.images.size > 1 %}
+          <div class="product-thumbnails">
+            {% for image in product.images %}
+              <div class="thumbnail{% if forloop.first %} active{% endif %}" 
+                   data-image-id="{{ image.id }}"
+                   data-image-url="{{ image | img_url: '600x' }}">
+                <img src="{{ image | img_url: '100x' }}" alt="{{ image.alt | escape }}">
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      </div>
+      
+      <div class="product-details">
+        <h1 class="product-title">{{ product.title }}</h1>
+        
+        <div class="product-price">
+          <span class="current-price">{{ product.price | money }}</span>
+          {% if product.compare_at_price > product.price %}
+            <span class="compare-price">{{ product.compare_at_price | money }}</span>
+            <span class="sale-badge">Sale</span>
+          {% endif %}
+        </div>
+        
+        {% if product.description != blank %}
+          <div class="product-description">
+            {{ product.description }}
+          </div>
+        {% endif %}
+        
+        {% form 'product', product %}
+          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+          
+          {% if product.has_only_default_variant == false %}
+            {% for option in product.options_with_values %}
+              <div class="product-option">
+                <label for="option-{{ option.name | handleize }}">{{ option.name }}</label>
+                <select id="option-{{ option.name | handleize }}" name="options[{{ option.name }}]">
+                  {% for value in option.values %}
+                    <option value="{{ value }}"{% if option.selected_value == value %} selected{% endif %}>
+                      {{ value }}
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            {% endfor %}
+          {% endif %}
+          
+          <div class="product-quantity">
+            <label for="quantity">Quantity</label>
+            <div class="quantity-selector">
+              <button type="button" class="quantity-btn quantity-minus">-</button>
+              <input type="number" id="quantity" name="quantity" value="1" min="1">
+              <button type="button" class="quantity-btn quantity-plus">+</button>
+            </div>
+          </div>
+          
+          <div class="product-actions">
+            <button type="submit" name="add" class="add-to-cart-btn"
+                    {% unless product.available %}disabled{% endunless %}>
+              {% if product.available %}
+                Add to Cart
+              {% else %}
+                Sold Out
+              {% endif %}
+            </button>
+            
+            <button type="button" class="wishlist-btn">
+              Add to Wishlist
+            </button>
+          </div>
+        {% endform %}
+        
+        <div class="product-meta">
+          <div class="meta-item">
+            <span>SKU:</span> {{ product.selected_or_first_available_variant.sku }}
+          </div>
+          {% if product.vendor %}
+            <div class="meta-item">
+              <span>Brand:</span> {{ product.vendor }}
+            </div>
+          {% endif %}
+          {% if product.type %}
+            <div class="meta-item">
+              <span>Type:</span> {{ product.type }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+    <div class="product-tabs">
+      <div class="tabs-header">
+        <button class="tab-btn active" data-tab="description">Description</button>
+        <button class="tab-btn" data-tab="specifications">Specifications</button>
+        <button class="tab-btn" data-tab="reviews">Reviews</button>
+      </div>
+      
+      <div class="tab-content active" id="description-tab">
+        {{ product.description }}
+      </div>
+      
+      <div class="tab-content" id="specifications-tab">
+        <table class="specifications-table">
+          {% for tag in product.tags %}
+            {% if tag contains 'spec:' %}
+              {% assign spec_parts = tag | remove: 'spec:' | split: ':' %}
+              <tr>
+                <th>{{ spec_parts[0] }}</th>
+                <td>{{ spec_parts[1] }}</td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </table>
+      </div>
+      
+      <div class="tab-content" id="reviews-tab">
+        <div class="reviews-placeholder">
+          <p>Product reviews will appear here.</p>
+        </div>
+      </div>
+    </div>
+    
+    {% if recommendations.products_count > 0 %}
+      <div class="related-products">
+        <h2>You May Also Like</h2>
+        <div class="products-slider">
+          {% for product in recommendations.products %}
+            <div class="product-card">
+              <div class="product-card__image">
+                <a href="{{ product.url }}">
+                  <img src="{{ product.featured_image | img_url: '300x' }}" 
+                       alt="{{ product.featured_image.alt | escape }}">
+                </a>
+                {% if product.compare_at_price > product.price %}
+                  <span class="sale-badge">Sale</span>
+                {% endif %}
+              </div>
+              
+              <div class="product-card__info">
+                <h3><a href="{{ product.url }}">{{ product.title }}</a></h3>
+                <div class="product-card__price">
+                  <span class="price">{{ product.price | money }}</span>
+                  {% if product.compare_at_price > product.price %}
+                    <span class="compare-at-price">{{ product.compare_at_price | money }}</span>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</div> 

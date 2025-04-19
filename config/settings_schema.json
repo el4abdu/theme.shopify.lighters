@@ -1,0 +1,66 @@
+{
+  "name": "Global Testimonials",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Testimonials Display"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_global_testimonials",
+      "label": "Show global testimonials",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "testimonials_title",
+      "label": "Testimonials title",
+      "default": "What Our Customers Say"
+    },
+    {
+      "type": "text",
+      "id": "testimonials_subtitle",
+      "label": "Testimonials subtitle",
+      "default": "Read what customers are saying about our products"
+    },
+    {
+      "type": "color",
+      "id": "testimonials_bg_color",
+      "label": "Background color",
+      "default": "#f8f8f8"
+    },
+    {
+      "type": "color",
+      "id": "testimonials_text_color",
+      "label": "Text color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "testimonial_card_bg",
+      "label": "Testimonial card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "testimonial_accent_color",
+      "label": "Accent color (stars, quotes)",
+      "default": "#f2994a"
+    },
+    {
+      "type": "header",
+      "content": "Call to Action"
+    },
+    {
+      "type": "text",
+      "id": "testimonials_cta_text",
+      "label": "CTA button text",
+      "default": "Write a Review"
+    },
+    {
+      "type": "url",
+      "id": "testimonials_cta_url",
+      "label": "CTA button link"
+    }
+  ]
+} 
